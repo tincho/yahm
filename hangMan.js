@@ -1,6 +1,6 @@
 'use strict';
 if (typeof window === 'undefined') {
-    require("Object.assign.js");
+    require("./Object.assign.js");
     module.exports = HangMan;
 }
 
@@ -11,6 +11,7 @@ Array.prototype.clone = function() {
 function HangMan(deliveranceWord, events) {
 
     if (!deliveranceWord.match(/^([a-zA-Z]+)$/)) {
+        throw new Error("Invalid word");
         console.log("Invalid word");
         return;
     }
@@ -38,8 +39,8 @@ function HangMan(deliveranceWord, events) {
     this.guessed = guessed.clone();
 
     // public methods
-    this.on  = registerEvent.bind({callbacks: callbacks})
-    this.try = tryLetter;
+    this.on     = registerEvent.bind({callbacks: callbacks})
+    this.try    = tryLetter;
     this.hazard = hazardWord;
 
     // fn definitions
