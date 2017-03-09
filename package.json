@@ -1,0 +1,15 @@
+{
+  "name": "hangman",
+  "version": "1.0.0",
+  "description": "Yet Another HangMan game",
+  "main": "hangMan.js",
+  "scripts": {
+    "test": "mocha -R spec test/*.spec.js"
+  },
+  "author": "Tin <tin@nuku.com.ar>",
+  "license": "ISC",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.2.0"
+  }
+}
