@@ -7,6 +7,9 @@ if (typeof window === 'undefined') {
 Array.prototype.clone = function() {
     return this.slice(0);
 }
+String.prototype.find = function findInThis(char, onMatch) {
+    return findIn(this, char, onMatch);
+};
 
 function HangMan(deliveranceWord, events) {
 
@@ -48,40 +51,24 @@ function HangMan(deliveranceWord, events) {
         if (dead)  return "Dead man! You're hanging!";
         if (saved) return "You're already saved! Wanna come back to the gallow?";
 
+        letter = letter.toLowerCase();
+
         var invalid = invalidInput.call(this, letter);
         if (invalid !== false) {
+            throw new Error("Invalid letter");
             return invalid;
         }
 
-        letter = letter.toLowerCase();
 
-        if (guessed.indexOf(letter) !== -1) return;
+        if (findIn(guessed, letter)) return; // @TODO some event for maybe the frontend to know if should do some animation (?)
 
-        var pos, iPos = 0;
-        while ( (pos = deliveranceWord.indexOf(letter, iPos)) !== -1 ) {
-            guessed[pos] = deliveranceWord[pos];
-            iPos = pos + 1;
-        }
+        var found = deliveranceWord.find(letter, setKeyValueTo(guessed));
 
-        if (iPos === 0) {
-            this.failed.push(letter);
-            var part = bodyParts.shift();
-            drawnParts.push(part);
-            trigger("fail", part, bodyParts.clone());
+        return [
+            failLetter.bind(this, letter),
+            guessLetter.bind(this)
+        ][+found];
 
-            if (!bodyParts.length) {
-                hang();
-            }
-            return; // return what? :)
-        }
-
-        this.guessed = guessed.clone(); // for safety
-        trigger("guess", this.guessed);
-
-        if ( guessed.join("") === deliveranceWord ) {
-            save();
-        }
-        return this.guessed; // is this needed?
     }
 
     function hazardWord(word) {
@@ -97,6 +84,32 @@ function HangMan(deliveranceWord, events) {
     function save() {
         saved = true;
         trigger("saved", deliveranceWord);
+    }
+
+    function failLetter(letter) {
+        this.failed.push(letter);
+        var part = bodyParts.shift();
+        drawnParts.push(part);
+        trigger("fail", part, bodyParts.clone());
+
+        if (!bodyParts.length) {
+            hang();
+        }
+    }
+
+    function guessLetter() {
+        this.guessed = guessed.clone();
+        // for safety:
+        // tryLetter checks against guessed
+        // and win is checked against guessed
+        // if instance.guessed contains a reference to that "private" var
+        // it could be modified from outside
+        // but i'm doing it twice !
+        trigger("guess", this.guessed);
+
+        if ( guessed.join("") === deliveranceWord ) {
+            save();
+        }
     }
 
     // utilities
@@ -131,5 +144,22 @@ function triggerEvent() {
         evt  = args.shift();
     return (this.callbacks[evt] || noop).apply(this, args);
 }
+
+function findIn(collection, item, onMatch) {
+    var pos = -1, found = false;
+    while ((pos = collection.indexOf(item, pos + 1)) !== -1 ) {
+        found = true;
+        (typeof onMatch === 'function') && onMatch(pos, item);
+    }
+    return found;
+}
+
+function setKeyValueTo(target) {
+    return function(key, value) {
+        target[key] = value;
+        return target; // ?
+    }
+}
+
 
 function noop(){}
