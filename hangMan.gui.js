@@ -1,13 +1,13 @@
 var
     words      = ["steam", "mulch", "grasshoper", "placide"],
     randomWord = words[Math.floor(Math.random() * words.length)],
-    $          = document.querySelector.bind(document);
+    $          = document.querySelector.bind(document),
+    $getInput  = document.querySelector.bind(document, "input.try:enabled");
 
 Element.prototype.appendAfter = function(element) {
     element.parentNode.insertBefore(this, element.nextSibling);
     return this;
 };
-
 
 (function init() {
     window.game = new HangMan(randomWord);
@@ -21,14 +21,11 @@ Element.prototype.appendAfter = function(element) {
 })();
 
 function setupInput() {
-    $("input.try:enabled")
+    var tryLetter = game.try.bind(game);
+    $getInput()
         .addEventListener("change", compose(
-            //bfore i was like:
-            //get("target"),
-            //get("value"),
-            //but then i got refactor'd
-            get("target.value"),
-            game.try.bind(game) // ES6/7 ::game.try
+            myProperty("target.value"),
+            tryLetter // ES6/7 ::game.try
         ));
 }
 
@@ -36,7 +33,7 @@ function onFail(part, left) {
     $(".man__part."+part).innerText = part;
     $(".info").innerText = left.length + " chances";
 
-    var $input = $("input.try:enabled");
+    var $input = $getInput();
     $input.disabled = true;
     $input.style.display = "inline-block";
 
@@ -49,27 +46,27 @@ function onFail(part, left) {
 }
 
 function onGuess(guessed) {
-    var $input = $("input.try:enabled");
-    $input.value = "";
-
+    $getInput().value = "";
     $(".guessed").innerText = guessed.toString();
 }
 
-function onSaved() {
+function onSaved(word) {
     debugger
+    console.log(arguments);
+    alert("Youre saved! It was " + word);
 }
 
-function onDead() {
+function onDead(word) {
     debugger
+    console.log(arguments);
+    $(".guessed").innerText = word.split("").join(",");
+    alert("Youre DEAD! It was " + word);
 }
 
 
 // functional utilitiy belt
-function get() {
-    var
-        args    = [].slice.call(arguments),
-        getters = mkGetters(args);
-
+function myProperty() {
+    var getters = mkGetters([].slice.call(arguments));
     return compose.apply(null, getters);
 
     function mkGetters(args) {
@@ -81,6 +78,8 @@ function get() {
             }
         }
         return keys.map(function(key) {
+            // return get.bind(null)
+            // return partial(get, obj, key)
             return function(obj) {
                 return obj[key];
             }
