@@ -42,18 +42,23 @@ describe("HangMan game", function() {
     });
 
     describe("Basic gameplay", function() {
+
         describe("Win", function() {
             var g;
             beforeEach(function() {
                 g = new HangMan("mississipi");
             });
-            it("should win", function() {
+            it("should win letter by letter", function() {
                 g.try("m");
                 g.try("i");
                 g.try("s");
                 g.try("p");
                 // assertion ?
             });
+            it("should win by full word hazard", function() {
+                g.hazard("mississipi");
+                // assertion ?
+            })
         });
 
         describe("Hang", function() {
@@ -61,7 +66,8 @@ describe("HangMan game", function() {
             beforeEach(function() {
                 g = new HangMan("mississipi");
             });
-            it("should lose", function() {
+            it("should lose letter by letter", function() {
+                // get g.bodyParts to know how many tries ?
                 g.try("e");
                 g.try("a");
                 g.try("o");
@@ -70,7 +76,27 @@ describe("HangMan game", function() {
                 g.try("f");
                 // assertions ?
             });
+            it("should lose by failed full word hazard", function() {
+                g.hazard("minessota");
+                // assertion ?
+            })
         });
+
+        describe("Events", function() {
+            it("should fail letter", function(){
+
+            });
+            it("should guess letter", function(){
+
+            });
+            it("should be saved", function(){
+
+            });
+            it("should be hang", function(){
+
+            });
+        });
+
 
     });
 
