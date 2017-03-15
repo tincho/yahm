@@ -52,15 +52,13 @@ function onGuess(guessed) {
 }
 
 function onSaved(word) {
-    debugger
     console.log(arguments);
     alert("Youre saved! It was " + word);
 }
 
 function onDead(word) {
-    debugger
     console.log(arguments);
-    $(".guessed").innerText = word.split("").join(",");
+    showRevealed();
     alert("Youre DEAD! It was " + word);
 }
 
