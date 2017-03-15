@@ -59,16 +59,11 @@ function HangMan(deliveranceWord, events) {
             return invalid;
         }
 
-
         if (findIn(guessed, letter)) return; // @TODO some event for maybe the frontend to know if should do some animation (?)
 
         var found = deliveranceWord.find(letter, setKeyValueTo(guessed));
 
-        return [
-            failLetter.bind(this, letter),
-            guessLetter.bind(this)
-        ][+found];
-
+        return [ failLetter, guessLetter ][+found].call(this, letter);
     }
 
     function hazardWord(word) {
