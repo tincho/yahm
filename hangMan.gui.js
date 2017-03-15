@@ -17,6 +17,7 @@ Element.prototype.appendAfter = function(element) {
         saved : onSaved,
         dead  : onDead
     });
+    showRevealed();
     setupInput();
 })();
 
@@ -47,7 +48,7 @@ function onFail(part, left) {
 
 function onGuess(guessed) {
     $getInput().value = "";
-    $(".guessed").innerText = guessed.toString();
+    showRevealed();
 }
 
 function onSaved(word) {
@@ -63,6 +64,14 @@ function onDead(word) {
     alert("Youre DEAD! It was " + word);
 }
 
+function showRevealed() {
+    var guessed = [];
+    for(var i = 0; i < game.guessed.length; i++) {
+        guessed[i] = typeof game.guessed[i] === 'undefined' ? '_' : game.guessed[i];
+    }
+    // var guessed = game.guessed.map(l => typeof l === 'undefined' ? '_' : l);
+    $(".guessed").innerText = guessed.join(" ");
+}
 
 // functional utilitiy belt
 function myProperty() {
